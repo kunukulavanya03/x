@@ -1,17 +1,13 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from settings import settings
+from sqlalchemy.orm import declarative_base, scoped_session
+from sqlalchemy.orm.session import sessionmaker
+from main import app
 
+SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost:5432/database"
 engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+    SQLALCHEMY_DATABASE_URL
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+SessionLocal = scoped_session(sessionmaker(bind=engine))
